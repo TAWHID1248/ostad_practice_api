@@ -7,6 +7,13 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework import generics
 
+from rest_framework import viewsets
+
+from . import permissions
+from rest_framework.permissions import IsAuthenticated
+
+# _____function based views_____
+
 # @api_view(['GET', 'POST'])
 # def movie_list(request):
 #     if request.method == 'GET':
@@ -57,20 +64,33 @@ from rest_framework import generics
 #         movie.delete()
 #         return Response({'message': 'Movie deleted successfully!!'})
 
+# _____class based views_____
 
-class MovieListView(generics.ListCreateAPIView):
-    queryset = models.MovieList.objects.all()
+# class MovieListView(generics.ListCreateAPIView):
+#     queryset = models.MovieList.objects.all()
+#     serializer_class = MovieListSerializer
+
+
+# class MovieDetailView(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = models.MovieList.objects.all()
+#     serializer_class = MovieListSerializer
+
+# class ReviewListView(generics.ListCreateAPIView):
+#     queryset = models.Reviews.objects.all()
+#     serializer_class = ReviewSerializer
+
+# class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = models.Reviews.objects.all()
+#     serializer_class = ReviewSerializer
+
+
+
+class MovieListViewSet(viewsets.ModelViewSet):
+    queryset = models.MovieList.objects.prefetch_related('reviews') #m2m ba foreign key relationship er jonno prefetch_related use korte hoy
     serializer_class = MovieListSerializer
 
 
-class MovieDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = models.MovieList.objects.all()
-    serializer_class = MovieListSerializer
-
-class ReviewListView(generics.ListCreateAPIView):
-    queryset = models.Reviews.objects.all()
+class ReviewListViewSet(viewsets.ModelViewSet):
+    queryset = models.Reviews.objects.select_related('movie') #m2m ba foreign key relationship er jonno select_related use korte hoy
     serializer_class = ReviewSerializer
-
-class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = models.Reviews.objects.all()
-    serializer_class = ReviewSerializer
+    permission_classes = [permissions.IsReviewerOrReadOnly, IsAuthenticated]

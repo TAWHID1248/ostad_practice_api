@@ -5,6 +5,8 @@ from watch_list import models
 
 
 class  ReviewSerializer(serializers.ModelSerializer):
+    reviewer = serializers.StringRelatedField()
+    
     class Meta:
         model = models.Reviews
         fields = '__all__'
